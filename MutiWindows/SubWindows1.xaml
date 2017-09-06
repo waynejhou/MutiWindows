@@ -1,0 +1,14 @@
+﻿<Window x:Class="MutiWindows.SubWindows1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MutiWindows"
+        mc:Ignorable="d"
+        Title="SubWindows1" Height="250" Width="250" WindowStyle="None" ResizeMode="NoResize" Background="Transparent" AllowsTransparency="True">
+    <Border x:Name="Ground" BorderBrush="#FD000000" BorderThickness="0" Background="#FFFFD29D" CornerRadius="25" Margin="1">
+        <Border.Effect>
+            <BlurEffect RenderingBias="Quality"/>
+        </Border.Effect>
+    </Border>
+</Window>
