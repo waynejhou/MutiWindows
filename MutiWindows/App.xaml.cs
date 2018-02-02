@@ -13,5 +13,12 @@ namespace MutiWindows
     /// </summary>
     public partial class App : Application
     {
+        private void Application_Activated(object sender, EventArgs e)
+        {
+            foreach(Window w in Windows)
+            {
+                w.Activate();
+            }
+        }
     }
 }

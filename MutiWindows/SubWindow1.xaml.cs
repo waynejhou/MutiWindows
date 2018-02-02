@@ -1,5 +1,4 @@
-﻿using Gma.System.MouseKeyHook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,19 +15,13 @@ using System.Windows.Shapes;
 namespace MutiWindows
 {
     /// <summary>
-    /// SubWindows1.xaml 的互動邏輯
+    /// SubWindow1.xaml 的互動邏輯
     /// </summary>
-    public partial class SubWindows1 : Window
+    public partial class SubWindow1 : Window
     {
-        private IKeyboardMouseEvents mouseGlobalEvents;
-        public SubWindows1()
+        public SubWindow1()
         {
-            // Set This Windows as Draggedable
-            this.MouseLeftButtonDown += MouseDragging.MouseLeftButtonDown;
-            //
             InitializeComponent();
         }
-
-
     }
 }

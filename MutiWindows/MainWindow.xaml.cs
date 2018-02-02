@@ -1,9 +1,10 @@
-﻿using Gma.System.MouseKeyHook;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,70 +23,50 @@ namespace MutiWindows
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IKeyboardMouseEvents mouseGlobalEvents;
+        
+
         public MainWindow()
         {
-            // Init MouseDragging Event;
-            mouseGlobalEvents = Hook.GlobalEvents();
-            mouseGlobalEvents.MouseMoveExt += MouseDragging.GlobalMouseMoveExt;
-            mouseGlobalEvents.MouseUpExt += MouseDragging.GlobalMouseUpExt;
-            this.MouseLeftButtonDown += MouseDragging.MouseLeftButtonDown;
-            //
+            //ScreenDebugVisualier.Show();
+            MouseDragging.ActiveWindowMouseDragging();
+            MouseDragging.AddWindow(this);
             InitializeComponent();
-            MouseDragging.ActivitedWindows.Add(this);
-            // Init SubWindows
-            SubWindows1 subWindows1 = new SubWindows1();
-            subWindows1.Show();
-            MouseDragging.ActivitedWindows.Add(subWindows1);
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0);
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        SubWindow1 subWindow1 = new SubWindow1() { Title = "1" };
+        SubWindow1 subWindow2 = new SubWindow1() { Title = "2" };
+        SubWindow1 subWindow3 = new SubWindow1() { Title = "3" };
+        private void MainWin_Loaded(object sender, RoutedEventArgs e)
         {
-            var filePicker = new System.Windows.Forms.OpenFileDialog();
-            filePicker.Filter = "Audio files(*.mp3;*.wav;*.flac)|*.mp3;*.wav;*.flac";
-            switch (filePicker.ShowDialog())
-            {
-                case System.Windows.Forms.DialogResult.None:
-                    break;
-                case System.Windows.Forms.DialogResult.OK:
-                    TagLib.Tag tag = TagLib.File.Create(filePicker.FileName).Tag;
-                    LabelTitle.Content = tag.Title;
-                    LabelAlbumArtists.Content = tag.Album + "◆" + ((tag.Performers.Length > 0) ? tag.Performers[0] : "");
-                    ImageAlbum.Source = (tag.Pictures.Length > 0) ? BytesToImageSource(tag.Pictures[0].Data.Data) : null;
-                    break;
-                case System.Windows.Forms.DialogResult.Cancel:
-                    break;
-                case System.Windows.Forms.DialogResult.Abort:
-                    break;
-                case System.Windows.Forms.DialogResult.Retry:
-                    break;
-                case System.Windows.Forms.DialogResult.Ignore:
-                    break;
-                case System.Windows.Forms.DialogResult.Yes:
-                    break;
-                case System.Windows.Forms.DialogResult.No:
-                    break;
-                default:
-                    break;
-            }
+            MouseDragging.AddWindow(subWindow1);
+            subWindow1.Show();
+            MouseDragging.AddWindow(subWindow2);
+            subWindow2.Show();
+            MouseDragging.AddWindow(subWindow3);
+            subWindow3.Show();
         }
-        BitmapImage BytesToImageSource(Byte[] b)
+
+        private void Sticky_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            using (MemoryStream memory = new MemoryStream(b))
-            {
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-                return bitmapimage;
-            }
+            MouseDragging.StickyPixel = (int)((sender as Slider).Value);
+            StickyText.Content = "StickyPixel: "+ (int)((sender as Slider).Value) + " pixel.";
+        }
+
+        private void Resize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MouseDragging.ResizePixel = (int)((sender as Slider).Value);
+            Ground.BorderThickness = new Thickness((sender as Slider).Value);
+            ResizeText.Content = "ResizePixel: " + (int)((sender as Slider).Value) + " pixel.";
+            if (subWindow1.IsVisible)
+                subWindow1.Ground.BorderThickness = new Thickness((sender as Slider).Value);
+            if (subWindow2.IsVisible)
+                subWindow2.Ground.BorderThickness = new Thickness((sender as Slider).Value);
+            if (subWindow3.IsVisible)
+                subWindow3.Ground.BorderThickness = new Thickness((sender as Slider).Value);
         }
     }
 }

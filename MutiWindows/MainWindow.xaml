@@ -4,40 +4,46 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MutiWindows"
-        mc:Ignorable="d"
-        Title="MutiWindows" Height="252" Width="602" WindowStyle="None" ResizeMode="NoResize" Background="#00000000" AllowsTransparency="True" Closed="Window_Closed">
-    <Grid Margin="1">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="10"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="3*"/>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="10"/>
-        </Grid.RowDefinitions>
-        <Border x:Name="Ground" BorderThickness="0" HorizontalAlignment="Left" Height="250" VerticalAlignment="Top" Width="600" CornerRadius="25" Background="#FFFFD29D" BorderBrush="Black" Grid.RowSpan="5" Grid.ColumnSpan="4">
-            <Border.Effect>
-                <BlurEffect RenderingBias="Quality"/>
-            </Border.Effect>
+        mc:Ignorable="d" x:Name="MainWin"
+        Title="MutiWindows" Height="300" Width="300"
+        Background="{x:Null}"
+        Closed="Window_Closed" ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None"
+        MinWidth="300" MinHeight="300" Loaded="MainWin_Loaded">
+
+    <Grid>
+        <Border x:Name="Ground"
+                BorderThickness="10" Background="Yellow" BorderBrush="Red"
+                Width="{Binding ActualWidth, ElementName=MainWin, Mode=OneWay}"
+                Height="{Binding ActualHeight, ElementName=MainWin, Mode=OneWay}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  
+                    Content="{Binding Title,ElementName=MainWin}"/>
+                <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="1"  
+                    Content="{Binding ActualWidth, ElementName=MainWin}"/>
+                <Label Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="1"  
+                    Content="{Binding ActualHeight, ElementName=MainWin}"/>
+                <Label x:Name="StickyText" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"  
+                    Content="StickyPixel"/>
+                <Label x:Name="ResizeText" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2"  
+                    Content="ResizePixel"/>
+                <Slider x:Name="Sticky" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" ValueChanged="Sticky_ValueChanged"
+                        Minimum="1" Value="15" Maximum="100"/>
+                <Slider x:Name="Resize" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" ValueChanged="Resize_ValueChanged"
+                        Minimum="1" Value="10" Maximum="100"/>
+            </Grid>
         </Border>
-        <Image x:Name="ImageAlbum" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2"/>
-        <Canvas Grid.Row="1" Grid.Column="2">
-            <Label x:Name="LabelTitle" Content="Label" Canvas.Left="10" Canvas.Top="10" Width="367" Height="30" RenderTransformOrigin="0.76,0.829"/>
-            <Label x:Name="LabelAlbumArtists" Content="Label" Canvas.Left="10" Canvas.Top="40" Height="30" Width="367"/>
-        </Canvas>
-        <Canvas Grid.Column="2" Grid.Row="2">
-            <Button Content="Button" Canvas.Left="165" Canvas.Top="36" Width="50" Height="50"/>
-            <Button Content="Button" Canvas.Left="220" Canvas.Top="36" Width="50" Height="50"/>
-            <Button Content="Button" Canvas.Left="110" Canvas.Top="36" Width="50" Height="50"/>
-            <Button Content="Button" Canvas.Left="275" Canvas.Top="66" Width="50" Height="20" Click="Button_Click"/>
-        </Canvas>
-        <Canvas Grid.Column="1" HorizontalAlignment="Left" Height="58" Grid.Row="3" VerticalAlignment="Top" Width="580" Grid.ColumnSpan="2">
-            <Slider Canvas.Left="10" Canvas.Top="19" Width="560" Height="20"/>
-        </Canvas>
+
     </Grid>
 </Window>
