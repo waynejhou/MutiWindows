@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,21 +19,28 @@ namespace MutiWindows
         static IKeyboardMouseEvents mouseGlobalEvents;
         static bool isDragging = false;
         static bool isResizeing = false;
-        static bool preResizeing = false;
         static Point offsetPoint = new Point();
         static Point offsetScreen = new Point();
         static Rect offsetRect = new Rect();
         static int Counter = 0;
         static Window senderWindow;
         static int stickyWindowPixel = 15;
+        /// <summary>
+        /// 黏住視窗時所需的像素距離
+        /// </summary>
         static public int StickyPixel { get => stickyWindowPixel; set => stickyWindowPixel = value; }
         static int resizeWindowPixel = 10;
+        /// <summary>
+        /// 觸發改變大小的像素距離
+        /// </summary>
         static public int ResizePixel { get => resizeWindowPixel; set => resizeWindowPixel = value; }
         static List<Window> ActivitedWindows = new List<Window>();
-        static List<Window> StickToMain = new List<Window>();
         static RelativeDirection LastDirect = RelativeDirection.None;
         static RelativeDirection Direct = RelativeDirection.None;
 
+        /// <summary>
+        /// 啟用事件
+        /// </summary>
         static public void ActiveWindowMouseDragging()
         {
             mouseGlobalEvents = Hook.GlobalEvents();
@@ -40,6 +48,11 @@ namespace MutiWindows
             mouseGlobalEvents.MouseUpExt += GlobalMouseUpExt;
             mouseGlobalEvents.MouseDoubleClick += GlobalMouseDoubleClick;
         }
+        /// <summary>
+        /// 增加要套用的視窗
+        /// </summary>
+        /// <param name="window">要套用的視窗</param>
+        /// <param name="enableResize">是否能夠調整大小 預設為是</param>
         static public void AddWindow( Window window, bool enableResize=true)
         {
             if (!ActivitedWindows.Contains(window))
@@ -106,24 +119,34 @@ namespace MutiWindows
             {
                 Point fp = new Point(e.X - offsetPoint.X, e.Y - offsetPoint.Y);
                 Rect senderRect = new Rect(fp.X, fp.Y, senderWindow.ActualWidth, senderWindow.Height);
+                Point Axis = new Point(e.X - offsetScreen.X, e.Y - offsetScreen.Y);
                 foreach (var screen in System.Windows.Forms.Screen.AllScreens)
                 {
                     var result = ScreenBoundaryCollisionDirection(senderRect,
                         new Rect(screen.Bounds.X, screen.Bounds.Y, screen.Bounds.Width, screen.Bounds.Height));
                     if (result.Is1stDirection(BaseDirection.Left))
+                    {
                         fp.X = screen.Bounds.Left;
+                    }
                     if (result.Is1stDirection(BaseDirection.Right))
+                    {
                         fp.X = screen.Bounds.Right - senderRect.Width;
+                    }
                     if (result.Is1stDirection(BaseDirection.Top))
+                    {
                         fp.Y = screen.Bounds.Top;
+                    }
                     if (result.Is1stDirection(BaseDirection.Bottom))
+                    {
                         fp.Y = screen.Bounds.Bottom - senderRect.Height;
+                    }
                 }
                 foreach (var window in ActivitedWindows.FindAll((Window x) => x.IsVisible))
                 {
                     if (window != senderWindow)
                     {
                         var result = WindowBoundaryCollisionDirection(senderRect, window.RestoreBounds);
+
                         if (result.Is1stDirection(BaseDirection.Left))
                             fp.X = window.RestoreBounds.Left - senderRect.Width;
                         if (result.Is1stDirection(BaseDirection.Right))
@@ -141,7 +164,6 @@ namespace MutiWindows
                         if (result.Is2ndDirection(BaseDirection.Bottom))
                             fp.Y = window.RestoreBounds.Bottom - senderRect.Height;
                     }
-
                 }
                 senderWindow.Left = fp.X;
                 senderWindow.Top = fp.Y;
@@ -350,7 +372,14 @@ namespace MutiWindows
             return rect;
         }
     }
-    /// byte
+
+    /// <summary>
+    /// 基本方位的列舉 0, 8, 4, 2, 1 對應 無, 上, 下, 左, 右 及 二進位 0000, 1000, 0100, 0010, 0001
+    /// </summary>
+    public enum BaseDirection { None = 0, Top = 8, Bottom = 4, Left = 2, Right = 1 }
+    /// <summary>
+    /// 相對方位 基本方位的疊加 有兩組
+    /// </summary>
     /// touched   untouched
     /// t b l r   t b l r
     /// 0 0 0 0   0 0 0 0
@@ -362,10 +391,13 @@ namespace MutiWindows
     ///       0000 0100   0x04
     ///        0000 0010  0x02
     ///         0000 0001 0x01
-    public enum BaseDirection { None = 0, Top = 8, Bottom = 4, Left = 2, Right = 1 }
     struct RelativeDirection
     {
         private int Direct;
+        /// <summary>
+        /// 宣告新的相對方位 由於 C# 對於 byte 型別的計算十分不友善 所以這裡用 int 但是超出範圍的不受理
+        /// </summary>
+        /// <param name="direct">方向值 基本上範圍為 0x00~0xff 或是 0b0000_0000~0b1111_1111 或是 0~255 </param>
         public RelativeDirection(int direct)
         {
             Direct = direct;

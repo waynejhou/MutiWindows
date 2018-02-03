@@ -28,8 +28,10 @@ namespace MutiWindows
         public MainWindow()
         {
             //ScreenDebugVisualier.Show();
+            Application.Current.MainWindow = this;
             MouseDragging.ActiveWindowMouseDragging();
             MouseDragging.AddWindow(this);
+
             InitializeComponent();
         }
 
